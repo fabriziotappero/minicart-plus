@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>PayPal minicart with weight-based shipping cost calculation</title>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+
+<body style="width:700px;margin-left: auto;margin-right: auto;font-family: 'Open Sans', sans-serif;">
+  <span id="PayPalMiniCart_ViewCart">My Cart</span>
+  <h2>PAYPAL CART WITH WEIGHT-BASED SHIPPING CHARGE</h2>
+  <p>This example shows the implementation of a PayPal shopping cart based on
+    Minicart (minicartjs.com) where the total shipping fee is based on freight
+    weight. The formula for the fee calculation is:</p>
+  <p>shipping_cost=shipping_fee_fixed+(shipping_weight_g/1E3)*shipping_fee_per_kg</p>
+  <p>So, at the end of the day, you can just use this code without really
+    wondering how it works. You just need to set the weight for each item using
+     "weight_g" and, the beginning of the code, define the following two variables:</p>
+  <p>shipping_fee_fixed = 12.00;</p>
+  <p>shipping_fee_per_kg = 6.50;</p>
+
+  <h3>ADVANTAGES OF THIS CODE</h3>
+  <p>Here some advanteages of this shopping cart compared to others.</p>
+  <ol>
+    <li>Shipping fee is based on weight via a simple linear formula.</li>
+    <li>Shipping fee is calculated and shown right away. Customers often leave
+       your shopping page because unsure about shipping costs.</li>
+    <li>Works on any browsers and device. The size of the shopping cart is
+      reduced to allow people to buy from mobile phones and small devices.</li>
+    <li>Shopping cart and the "My Cart" link is aways visible. Pretty cool...</li>
+    <li>Written in JS, no need for server-side code.</li>
+    <li>It interfaces with PayPal for secure money transfer.</li>
+    <li>It is FREE !</li>
+  </ol>
+
+  <h3>LIVE EXAMPLE</h3>
+  <p>Here a simple example of two shopping items with different weight and price.</p>
+
+  <strong>Test Product One: €123.18, 240g. </strong>
+  <div id="PayPalMiniCart" style='margin-bottom:30px;'>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+      <input type="hidden" name="cmd" value="_cart" />
+      <input type="hidden" name="add" value="1" />
+      <input type="hidden" name="business" value="example@minicartjs.com" />
+      <input type="hidden" name="item_name" value="Test Product One" />
+      <input type="hidden" name="item_number" value="ref. 04465462" />
+      <input type="hidden" name="quantity" value="1" />
+      <input type="hidden" name="amount" value="123.18" />
+      <input type="hidden" name="currency_code" value="EUR" />
+      <input type="hidden" name="weight_g" value="240">
+      <input type="submit" name="submit" value="BUY NOW" />
+    </form>
+  </div>
+
+  <strong>Test Product Two: €86.33, 185g. </strong>
+  <div id="PayPalMiniCart" style='margin-bottom:30px;'>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+      <input type="hidden" name="cmd" value="_cart" />
+      <input type="hidden" name="add" value="1" />
+      <input type="hidden" name="business" value="example@minicartjs.com" />
+      <input type="hidden" name="item_name" value="Test Product Two" />
+      <input type="hidden" name="item_number" value="ref. 8766124" />
+      <input type="hidden" name="quantity" value="1" />
+      <input type="hidden" name="amount" value="86.33" />
+      <input type="hidden" name="currency_code" value="EUR" />
+      <input type="hidden" name="weight_g" value="185">
+      <input type="submit" name="submit" value="BUY NOW" />
+    </form>
+  </div>
+
+  <h3>GIVE ME MORE</h3>
+  <p>I love it but I would you like further customisations. Drop me a line and
+     I will be happy to help you.</p>
+  <p>fabrizio.tappero(at)gmail.com</p>
+
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/minicart.min.js"></script>
+<script>
+  /* ############################## */
+  var shipping_fee_fixed = 12.00;
+  var shipping_fee_per_kg = 6.50;
+  /* ############################## */
+
+  /* render shopping cart and reposition on the right*/
+  paypal.minicart.render();
+  $('#PPMiniCart').css({
+    "right": "10px",
+    "left": "auto"
+  });
+  /* style shipping cart link */
+  $('#PayPalMiniCart_ViewCart').css({
+    'right': '2px',
+    'position': 'fixed',
+    'width': '90px',
+    'cursor': 'pointer',
+    'color': 'red'
+  });
+
+  // every time an item is removed calculate and update the cart shipping weight
+  paypal.minicart.cart.on('remove', function(idx, product) {
+    // do nothing if the item removed is the shipping cost
+    if (product.get('item_name').contains("Shipping and Handling")) {
+      return false;
+    }
+    update_cart_shipping_cost(idx, product);
+  });
+
+  // every time a item quantity is modified calculate and update the cart shipping weight
+  // not implemented because not so easy...
+  //$("#PPMiniCart .minicart-quantity").on("change keyup paste click", function(){
+  //  console.log('bingo');
+  //})
+
+  // every time an item is removed calculate and update the cart shipping weight
+  paypal.minicart.cart.on('add', function(idx, product) {
+    // do nothing if the item added is the shipping cost
+    if (product.get('item_name').contains("Shipping and Handling")) {
+      return false;
+    }
+    update_cart_shipping_cost(idx, product);
+  });
+
+  function update_cart_shipping_cost(idx, product) {
+    /* delete any previous shipping charge item */
+    var a, items = paypal.minicart.cart.items();
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].get('item_name').contains("Shipping and Handling")) {
+        paypal.minicart.cart.remove(i);
+      }
+    }
+
+    /* get quantity and weight for each cart item and calculate total weight */
+    var items = paypal.minicart.cart.items(),
+      q = [],
+      n1 = [],
+      w = 0;
+    var forms = $('#PayPalMiniCart form'),
+      shipping_weight_g = 0;
+    for (var i = 0; i < items.length; i++) {
+      q.push(items[i].get('quantity'));
+      n = items[i].get('item_name'); //shopping cart item name
+      // search for the corresponding weight
+      for (var ii = 0; ii < forms.length; ii++) {
+        if (n.contains(forms.children('input[name="item_name"]')[ii].value)) {
+          w = forms.children('input[name="weight_g"]')[ii].value;
+          // total weight calculation
+          shipping_weight_g += parseFloat(w * q[i]);
+        }
+      }
+    }
+
+    // calculate total shipping cost and add to cart
+    var shipping_cost = shipping_fee_fixed + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
+    if (shipping_weight_g > 0) {
+      shipping_cost = shipping_cost.toFixed(2);
+    } else {
+      shipping_cost = 0.00;
+    }
+    p = {
+      "business": "example@minicartjs.com",
+      "item_name": "Shipping and Handling",
+      "item_number": "International registered mail",
+      "amount": shipping_cost,
+      "currency_code": "EUR"
+    };
+    paypal.minicart.cart.add(p);
+
+    /* make all quantity field not editable */
+    $('#PPMiniCart .minicart-quantity').attr("disabled", true);
+    $('#PPMiniCart .minicart-quantity').css('background', 'white')
+      /* hide shipping cost item quantity and delete button*/
+    $("#PPMiniCart .minicart-item").each(function() {
+      if ($(this).find('.minicart-name').text().toLowerCase() == "shipping and handling") {
+        $(this).find('.minicart-quantity').css('visibility', 'hidden');
+        $(this).find('.minicart-remove').css('visibility', 'hidden');
+      }
+    });
+    /* style close and check out buttons */
+    $('.minicart-submit img').hide();
+    $('.minicart-submit').css({
+      'right': '150px',
+      'min-width': '90px',
+      'font-size': '12px',
+      'font-weight': 'normal'
+    });
+    $('.minicart-submit').text('Check Out');
+    $('.minicart-closer').text('Continue Shopping');
+    $('.minicart-closer').css({
+      'right': '150px',
+      'min-width': '100px',
+      'font-size': '12px',
+      'font-weight': 'normal',
+      'margin': '0'
+    });
+    $('.minicart-closer').insertBefore('.minicart-submit');
+  }
+
+  /* show shopping cart*/
+  $('#PayPalMiniCart_ViewCart').click(function(e) {
+    e.stopPropagation();
+    paypal.minicart.view.show();
+
+    /* make all quantity field not editable */
+    $('#PPMiniCart .minicart-quantity').attr("disabled", true);
+    $('#PPMiniCart .minicart-quantity').css('background', 'white')
+      /* hide shipping cost item quantity and delete button*/
+    $("#PPMiniCart .minicart-item").each(function() {
+      if ($(this).find('.minicart-name').text().toLowerCase() == "shipping and handling") {
+        $(this).find('.minicart-quantity').css('visibility', 'hidden');
+        $(this).find('.minicart-remove').css('visibility', 'hidden');
+      }
+    });
+    /* style close and check out buttons */
+    $('.minicart-submit img').hide();
+    $('.minicart-submit').css({
+      'right': '150px',
+      'min-width': '90px',
+      'font-size': '12px',
+      'font-weight': 'normal'
+    });
+    $('.minicart-submit').text('Check Out');
+    $('.minicart-closer').text('Continue Shopping');
+    $('.minicart-closer').css({
+      'right': '150px',
+      'min-width': '100px',
+      'font-size': '12px',
+      'font-weight': 'normal',
+      'margin': '0'
+    });
+    $('.minicart-closer').insertBefore('.minicart-submit');
+
+  });
+</script>
+
+</html>

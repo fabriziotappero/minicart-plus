@@ -11,7 +11,10 @@ git add .
 git commit -m "added some good stuff"
 
 ### STEP 3 ###
-git push origin master
+git push origin gh-pages
+
+the website is now available on:
+http://fabriziotappero.github.io/minicart-plus.git/
 
 more here here:
 http://rogerdudler.github.io/git-guide

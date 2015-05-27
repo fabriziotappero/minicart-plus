@@ -105,11 +105,12 @@ $(document).ready(function() {
         $('.minicart-closer').css({
             'position': 'absolute',
             'right': '5px',
+            'height':'33px',
             'min-width': '90px',
             'font-size': '13px',
             'font-weight': 'normal',
             'margin': '-3px -2px',
-            'padding': '8px 7px',
+            'padding': '5px 7px',
             'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
             'border': '1px solid #ffc727',
             'border-radius': '5px'
@@ -148,11 +149,12 @@ $(document).ready(function() {
         $('.minicart-closer').css({
             'position': 'absolute',
             'right': '5px',
+            'height':'33px',
             'min-width': '90px',
             'font-size': '13px',
             'font-weight': 'normal',
             'margin': '-3px -2px',
-            'padding': '8px 7px',
+            'padding': '5px 7px',
             'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
             'border': '1px solid #ffc727',
             'border-radius': '5px'

@@ -1,9 +1,9 @@
 /*!
  * Minicart-plus is a great PayPal shopping cart written in JavaScript.
  *
- * @version 1.0
+ * @version 1.1
  * @author Fabrizio Tappero <https://github.com/fabriziotappero>
- * @license MIT <https://github.com/jeffharrell/minicart/raw/master/LICENSE.md>
+ * @license <https://github.com/fabriziotappero/minicart-plus/blob/gh-pages/LICENSE>
  */
 $(document).ready(function() {
 

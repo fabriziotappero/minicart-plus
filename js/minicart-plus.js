@@ -7,7 +7,7 @@
  */
 $(document).ready(function() {
 
-    /* ############################## */
+    /* ################################################################### */
     var business_name = "example@minicartjs.com",
         shipping_fee_base = 12.00,
         shipping_fee_per_kg = 6.50,
@@ -17,7 +17,7 @@ $(document).ready(function() {
         check_out_button_txt = "Check Out",
         cart_total_txt = "",
         discount_txt = "";
-    /* ############################## */
+    /* ################################################################### */
 
     function update_cart_shipping_cost(idx, product) {
         var i, ii, shop_items;
@@ -80,7 +80,7 @@ $(document).ready(function() {
         paypal.minicart.cart.add(p);
 
         /* make all quantity fields not editable */
-        $('#PPMiniCart .minicart-quantity').attr("disabled", true);
+        $('#PPMiniCart .minicart-quantity').attr('readonly','readonly');
         $('#PPMiniCart .minicart-quantity').css({
             'background': 'white',
             'border': '0',
@@ -195,15 +195,14 @@ $(document).ready(function() {
     //  console.log('bingo');
     //})
 
-    // every time an item is removed calculate and update the cart shipping weight
+    // every time an item is added calculate and update the cart shipping weight
     paypal.minicart.cart.on('add', function(idx, product, isExisting) {
         // do nothing if the item added is the shipping cost
         if (product.get('item_name').toLowerCase() == "shipping and handling") {
             return 0;
         }
-        // calculate shipping costs
+        // calculate and update shipping costs
         update_cart_shipping_cost(idx, product);
-
         return 0;
     });
 

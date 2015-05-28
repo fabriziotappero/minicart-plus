@@ -124,7 +124,7 @@ $(document).ready(function() {
         paypal.minicart.view.show();
 
         /* make all quantity field not editable */
-        $('#PPMiniCart .minicart-quantity').attr("disabled", true);
+        $('#PPMiniCart .minicart-quantity').attr('readonly','readonly');
         $('#PPMiniCart .minicart-quantity').css({
             'background': 'white',
             'border': '0',

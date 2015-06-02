@@ -8,7 +8,7 @@
 $(document).ready(function() {
 
     /* ################################################################### */
-    var business_name = "example@minicartjs.com",
+    var business_name = "f.tappero@gmail.com",
         shipping_fee_base = 12.00,
         shipping_fee_per_kg = 6.50,
         shipping_txt = "Shipping and Handling",
@@ -39,9 +39,9 @@ $(document).ready(function() {
         /* style close button and check out buttons */
         $('.minicart-submit').css({
             'right': '148px',
-            'min-width': '90px',
-            'font-size': '15px',
-            'padding': '5px 6px',
+            'min-width': '77px',
+            'font-size': '14px',
+            'padding': '5px 2px',
             'font-weight': 'normal',
             'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
             'color': '#2F2F2F'
@@ -53,10 +53,10 @@ $(document).ready(function() {
             'right': '5px',
             'height': '33px',
             'min-width': '90px',
-            'font-size': '15px',
+            'font-size': '14px',
             'font-weight': 'normal',
             'margin': '-3px -2px',
-            'padding': '5px 6px',
+            'padding': '5px 2px',
             'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
             'color': '#2F2F2F',
             'border': '1px solid #ffc727',

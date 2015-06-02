@@ -42,7 +42,9 @@ $(document).ready(function() {
             'min-width': '90px',
             'font-size': '15px',
             'padding': '5px 6px',
-            'font-weight': 'normal'
+            'font-weight': 'normal',
+            'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
+            'color': '#2F2F2F'
         });
 
         $('.minicart-closer').text(cont_shopping_button_txt);
@@ -56,6 +58,7 @@ $(document).ready(function() {
             'margin': '-3px -2px',
             'padding': '5px 6px',
             'background': 'linear-gradient(to bottom, #fff6e9 0%, #ffaa00 100%) repeat scroll 0 0 rgba(0, 0, 0, 0)',
+            'color': '#2F2F2F',
             'border': '1px solid #ffc727',
             'border-radius': '5px'
         });

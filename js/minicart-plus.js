@@ -18,7 +18,38 @@ $(document).ready(function() {
         cont_shopping_button_txt = "Continue Shopping",
         cart_total_txt = "",
         discount_txt = "";
+
+    /* Fill in allowable country and the shipping price */
+    var countries = [
+        {countryName: 'United States', shippingPrice: 10.00},
+        {countryName: 'Canada', shippingPrice: 20.00},
+        {countryName: 'England', shippingPrice: 30.00}
+    ]
     /* ################################################################### */
+
+
+    // Initialized options for shipping locations
+    var option = '';
+    countries.forEach(function(country, index) {
+        //if location equals countryName set option selected
+        if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") == country.countryName) {
+            console.log('A');
+            option += '<option selected value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
+        }else {
+            console.log('B');
+            option += '<option value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
+        }
+    });
+
+    function calculateLocationShipping() {
+        // alert( "Handler for .change() called." );
+        if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") === $( "#location option:selected" ).text()) {
+        }else {
+            document.cookie = "locationPrice="+ $( "#location option:selected" ).val() +";";
+            document.cookie = "location="+ $( "#location option:selected" ).text() +";";
+        }
+        update_cart_shipping_cost();
+    }
 
     /* restyle the shopping cart has we like */
     function restyle_shopping_cart() {
@@ -29,6 +60,21 @@ $(document).ready(function() {
             'border': '0',
             'box-shadow': 'none'
         });
+
+        //Make sure this only run once so it doesnt duplicate the selectbox
+        if (!$(".minicart-location").length) {
+            /* Add country select list */    
+            $('.minicart-footer').before("<div class='minicart-location'><strong>Location: </strong><select id='location'>"+option+"</select></div>");
+            /* style selectbox location */
+            $('#PPMiniCart .minicart-location').css({
+                'margin': '6px',
+                'margin-bottom': '15px'
+            });
+            $( ".minicart-location" ).change(function() {
+                calculateLocationShipping();
+            });
+        }
+
         /* hide shipping cost item quantity and delete button*/
         $("#PPMiniCart .minicart-item").each(function() {
             if ($(this).find('.minicart-name').text().toLowerCase() == shipping_txt.toLowerCase()) {
@@ -71,6 +117,7 @@ $(document).ready(function() {
     /* calcualate shipping costs and update the cart */
     function update_cart_shipping_cost(idx, product) {
         var i, ii, shop_items;
+        var location_cost = $( "#location option:selected" ).val()
 
         /* get all current shopping items */
         shop_items = paypal.minicart.cart.items();
@@ -83,7 +130,7 @@ $(document).ready(function() {
             }
         }
 
-        //console.log("shop_items:", shop_items);
+        // console.log("shop_items:", shop_items);
 
         /* get quantity and weight for each cart item and calculate total weight */
         var cart_items_q = [],
@@ -114,7 +161,7 @@ $(document).ready(function() {
         //console.log("New Shipping Weight:",shipping_weight_g);
 
         // calculate total shipping cost and add to cart
-        var shipping_cost = shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
+        var shipping_cost = parseFloat(location_cost) + shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
         if (shipping_weight_g > 0) {
             shipping_cost = shipping_cost.toFixed(2);
         } else {

@@ -33,10 +33,8 @@ $(document).ready(function() {
     countries.forEach(function(country, index) {
         //if location equals countryName set option selected
         if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") == country.countryName) {
-            console.log('A');
             option += '<option selected value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
         }else {
-            console.log('B');
             option += '<option value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
         }
     });

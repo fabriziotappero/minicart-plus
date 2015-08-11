@@ -8,6 +8,13 @@
 $(document).ready(function() {
 
     /* ################################################################### */
+    
+    //Config variable for shipping method
+    var cartConf = { 
+        shipByWeight: true, //Not used
+        shipByLocation: true
+    }
+
     var business_name = "myName@example.com",
         shipping_fee_base = 12.00,
         shipping_fee_per_kg = 6.50,
@@ -19,34 +26,35 @@ $(document).ready(function() {
         cart_total_txt = "",
         discount_txt = "";
 
-    /* Fill in allowable country and the shipping price */
+    // Fill in allowable country and the shipping price */
     var countries = [
         {countryName: 'United States', shippingPrice: 10.00},
         {countryName: 'Canada', shippingPrice: 20.00},
         {countryName: 'England', shippingPrice: 30.00}
+        //..... 
     ]
-    /* ################################################################### */
-
 
     // Initialized options for shipping locations
     var option = '';
     countries.forEach(function(country, index) {
-        //if location equals countryName set option selected
-        if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") == country.countryName) {
-            option += '<option selected value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
-        }else {
-            option += '<option value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
-        }
+        option += '<option value="'+ country.shippingPrice + '">' + country.countryName + '</option>';
     });
+    /* ################################################################### */
 
     function calculateLocationShipping() {
-        // alert( "Handler for .change() called." );
-        if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") === $( "#location option:selected" ).text()) {
-        }else {
-            document.cookie = "locationPrice="+ $( "#location option:selected" ).val() +";";
+        if (document.cookie.replace(/(?:(?:^|.*;\s*)location\s*\=\s*([^;]*).*$)|^.*$/, "$1") == $( "#location option:selected" ).text()) {
+            reselectCountryOnChange();
+        }else{
             document.cookie = "location="+ $( "#location option:selected" ).text() +";";
+            reselectCountryOnChange();
         }
-        update_cart_shipping_cost();
+    }
+
+    //This is needed because the cart will render (restyled_shopping_cart()) over the selection discarding any changes
+    function reselectCountryOnChange() {
+        var option_value = $( "#location option:selected" ).val();
+        update_cart_shipping_cost(); //#location option:selected is re-rendered in this step
+        $("#location").val(option_value);
     }
 
     /* restyle the shopping cart has we like */
@@ -59,8 +67,10 @@ $(document).ready(function() {
             'box-shadow': 'none'
         });
 
+
+
         //Make sure this only run once so it doesnt duplicate the selectbox
-        if (!$(".minicart-location").length) {
+        if (!$(".minicart-location").length && cartConf.shipByLocation) {
             /* Add country select list */    
             $('.minicart-footer').before("<div class='minicart-location'><strong>Location: </strong><select id='location'>"+option+"</select></div>");
             /* style selectbox location */
@@ -68,9 +78,11 @@ $(document).ready(function() {
                 'margin': '6px',
                 'margin-bottom': '15px'
             });
+            
             $( ".minicart-location" ).change(function() {
                 calculateLocationShipping();
             });
+
         }
 
         /* hide shipping cost item quantity and delete button*/
@@ -115,7 +127,8 @@ $(document).ready(function() {
     /* calcualate shipping costs and update the cart */
     function update_cart_shipping_cost(idx, product) {
         var i, ii, shop_items;
-        var location_cost = $( "#location option:selected" ).val()
+        //Set location cost. Default to first on the list of countries if cannot be found. Set 0 if shipByWeight is disabled
+        var loc_cost = cartConf.shipByLocation ? $( "#location option:selected" ).val() || countries[0].shippingPrice : 0 ;
 
         /* get all current shopping items */
         shop_items = paypal.minicart.cart.items();
@@ -157,9 +170,8 @@ $(document).ready(function() {
             }
         }
         //console.log("New Shipping Weight:",shipping_weight_g);
-
         // calculate total shipping cost and add to cart
-        var shipping_cost = parseFloat(location_cost) + shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
+        var shipping_cost = parseFloat(loc_cost) + shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
         if (shipping_weight_g > 0) {
             shipping_cost = shipping_cost.toFixed(2);
         } else {

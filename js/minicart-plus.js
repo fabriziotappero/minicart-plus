@@ -30,7 +30,8 @@ $(document).ready(function() {
     var countries = [
         {countryName: 'United States', shippingPrice: 10.00},
         {countryName: 'Canada', shippingPrice: 20.00},
-        {countryName: 'England', shippingPrice: 30.00}
+        {countryName: 'England', shippingPrice: 30.00},
+        {countryName: 'Other', shippingPrice: 40.00}
         //..... 
     ]
 
@@ -171,6 +172,7 @@ $(document).ready(function() {
         }
         //console.log("New Shipping Weight:",shipping_weight_g);
         // calculate total shipping cost and add to cart
+        // Shipping calculation here
         var shipping_cost = parseFloat(loc_cost) + shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
         if (shipping_weight_g > 0) {
             shipping_cost = shipping_cost.toFixed(2);

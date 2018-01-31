@@ -112,6 +112,9 @@ $(document).ready(function() {
             }
         }
         //console.log("New Shipping Weight:",shipping_weight_g);
+        
+        // number of items in the basket
+        var num_items = cart_items_n.length;
 
         // calculate total shipping cost and add to cart
         var shipping_cost = shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
@@ -123,7 +126,8 @@ $(document).ready(function() {
         p = {
             "business": business_name,
             "item_name": shipping_txt,
-            "item_number": shipping_subtxt,
+            //"item_number": shipping_subtxt,
+            "item_number": "International Mail (" + num_items.toString() + " items)",
             "amount": shipping_cost,
             "currency_code": shipping_currency
         };

@@ -12,7 +12,7 @@ $(document).ready(function() {
         shipping_fee_base = 12.00,
         shipping_fee_per_kg = 6.50,
         shipping_txt = "Shipping and Handling",
-        shipping_subtxt = "International Registered Mail",
+        shipping_subtxt = "International Mail",
         shipping_currency = "EUR",
         check_out_button_txt = "Check Out",
         cont_shopping_button_txt = "Continue Shopping",
@@ -127,7 +127,7 @@ $(document).ready(function() {
             "business": business_name,
             "item_name": shipping_txt,
             //"item_number": shipping_subtxt,
-            "item_number": "International Mail (" + num_items.toString() + " items)",
+            "item_number": shipping_subtxt + " (" + num_items.toString() + " items)",
             "amount": shipping_cost,
             "currency_code": shipping_currency
         };

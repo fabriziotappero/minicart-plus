@@ -23,6 +23,7 @@
   <h3>MINICART-PLUS LIVE PREVIEW</h3>
   <p>Here it is a simple example of how to use minicart-plus. Once you look at the source code of this page, 
   the integration of minicart-plus in your webpage should be quite easy.</p>
+   <p>Note how a minimum order limit of 3 item is implemented in the last script section.</p>
  
   <strong>Test Product One: €123.18, 240g. </strong>
   <div id="PayPalMiniCart" style='margin-bottom:30px;'>
@@ -60,4 +61,23 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/minicart.min.js"></script>
 <script src="js/minicart-plus.js"></script>
+
+<script>
+    paypal.minicart.render();
+    paypal.minicart.cart.on('checkout', function (evt) {
+        var items = this.items(),
+            len = items.length,
+            total = 0,
+            i;
+        // Count the number of each item in the cart
+        for (i = 0; i < len; i++) {
+            total += items[i].get('quantity');
+        }
+        if (total < 3) {
+            alert('The minimum order quantity is 3. Please add more to your shopping cart before checking out');
+            evt.preventDefault();
+        }
+    });
+</script>
+
 </html>

@@ -153,6 +153,22 @@ $(document).ready(function() {
             discount: discount_txt
         }
     });
+    
+    /* fix a minimum order of 3 items in the shopping cart */
+    paypal.minicart.cart.on('checkout', function (evt) {
+        var items = this.items(),
+            len = items.length,
+            total = 0,
+            i;
+        // Count the number of each item in the cart
+        for (i = 0; i < len; i++) {
+            total += items[i].get('quantity');
+        }
+        if (total < 3) {
+            alert('The minimum order quantity is 3. Please add more to your shopping cart before checking out');
+            evt.preventDefault();
+        }
+    });
 
     $('#PPMiniCart').css({
         "right": "10px",

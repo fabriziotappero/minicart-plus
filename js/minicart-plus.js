@@ -14,6 +14,7 @@ $(document).ready(function() {
         shipping_txt = "Shipping and Handling",
         shipping_subtxt = "International Mail",
         shipping_currency = "EUR",
+        min_items_order = 6,
         check_out_button_txt = "Check Out",
         cont_shopping_button_txt = "Continue Shopping",
         cart_total_txt = "",
@@ -70,7 +71,7 @@ $(document).ready(function() {
 
     /* calcualate shipping costs and update the cart */
     function update_cart_shipping_cost(idx, product) {
-        var i, ii, shop_items;
+        var i, ii, shop_items, num_items=0;
 
         /* get all current shopping items */
         shop_items = paypal.minicart.cart.items();
@@ -78,12 +79,9 @@ $(document).ready(function() {
         /* delete any previous shipping charge item */
         for (i = 0; i < shop_items.length; i++) {
             if (shop_items[i].get('item_name').toLowerCase() == shipping_txt.toLowerCase()) {
-                //console.log(shop_items);
                 paypal.minicart.cart.remove(i);
             }
         }
-
-        //console.log("shop_items:", shop_items);
 
         /* get quantity and weight for each cart item and calculate total weight */
         var cart_items_q = [],
@@ -98,8 +96,7 @@ $(document).ready(function() {
             cart_items_n.push(shop_items[i].get('item_name')); //shopping cart item name
         }
 
-        //console.log("n", cart_items_n);
-        //console.log("q", cart_items_q);
+        //console.log("Numbers:",cart_items_q.length);
 
         // search for the corresponding weight of each item in the cart
         for (i = 0; i < cart_items_n.length; i++) {
@@ -111,10 +108,10 @@ $(document).ready(function() {
                 }
             }
         }
-        //console.log("New Shipping Weight:",shipping_weight_g);
         
         // number of items in the basket
-        var num_items = cart_items_n.length;
+        num_items = cart_items_n.length;
+    
 
         // calculate total shipping cost and add to cart
         var shipping_cost = shipping_fee_base + (shipping_weight_g / 1E3) * shipping_fee_per_kg;
@@ -126,7 +123,7 @@ $(document).ready(function() {
         p = {
             "business": business_name,
             "item_name": shipping_txt,
-            //"item_number": shipping_subtxt,
+            // Add purchased items in shipping_subtxt,
             "item_number": shipping_subtxt + " (" + num_items.toString() + " items)",
             "amount": shipping_cost,
             "currency_code": shipping_currency
@@ -158,7 +155,7 @@ $(document).ready(function() {
         }
     });
     
-    /* fix a minimum order of 3 items in the shopping cart */
+    /* fix a minimum order of items in the shopping cart */
     paypal.minicart.cart.on('checkout', function (evt) {
         var items = this.items(),
             len = items.length,
@@ -168,8 +165,8 @@ $(document).ready(function() {
         for (i = 0; i < len; i++) {
             total += items[i].get('quantity');
         }
-        if (total < 3) {
-            alert('The minimum order quantity is 3. Please add more to your shopping cart before checking out');
+        if (total < (min_items_order+1)) {
+            alert('Minimum order quantity is ' + min_items_order.toString() + '. Please add more to your shopping cart.');
             evt.preventDefault();
         }
     });
@@ -191,7 +188,6 @@ $(document).ready(function() {
 
         return 0;
     });
-
 
     // every time an item is added calculate and update the cart shipping weight
     paypal.minicart.cart.on('add', function(idx, product, isExisting) {
